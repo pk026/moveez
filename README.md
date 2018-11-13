@@ -46,7 +46,7 @@ or you can create database with your own set of parameters and update them into 
 10. run: python manage.py runserver
 
 
-#APIs request response
+# APIs request response
 http://localhost:8000/api/v1/company/?lat=18.9695&lng=72.8193
 [
     {
