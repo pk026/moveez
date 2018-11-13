@@ -9,6 +9,7 @@ from django.contrib.postgres.fields import ArrayField, JSONField
 
 
 class Company(models.Model):
+    owner = models.ForeignKey(User)
     name = models.CharField(
         max_length=128, null=True, blank=True)
     address = models.CharField(
