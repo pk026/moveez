@@ -17,9 +17,3 @@ class SlotSerializer(serializers.ModelSerializer):
     class Meta:
         model = Slot
         fields = '__all__'
-
-class BookedSlotSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = BookedSlot
-        fields = '__all__'
