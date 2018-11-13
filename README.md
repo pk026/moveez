@@ -18,14 +18,15 @@ match the screenshots below – a basic UI will work
     2. I am using Django user for company owner as well as end user.
     (we may have separate tables for company owner and end user for different information).
     3. Customer can request a shift any time.
-        a. here client would post user_id on trip api to create a trip in waiting status
-        b. In real scenario client would post source and destination for trip with user credentials
-    4. Driver can select from waiting trips to make a ride.
-        client patch {"status": "ongoing"} on api/v1/trip/{waiting_trip_id}/
-        # in backend we check if calling user is available,
-            we put a lock on trip row to update,
-            change the status to ongoing and assign driver and car to trip.
-    5. on operations dashboard user can refresh and get the trips with its status and timing
+        a. user will seeach for the address and picks on from the suggestion
+        b. when user selects address angular does ajax request to django server with lattitide and longitue on selected address.
+        c. Django sever filter the companies which are within the 50Km of selected point and returns Json on list of companies.
+        d. Angular then renders the list of companies.
+        e. When user clicks on company angular calls slot API with company id
+        f. Slot API returns future slot which user can select and confirm for booking.
+        g. On confirm booking angular does patch request to book than slot
+        h. backend saves the booking and fires a email to user of confirmation.
+
 # stacks used
 django, djangorestframework, postgresql, postgis
 
@@ -44,29 +45,73 @@ or you can create database with your own set of parameters and update them into 
 9. create a superuser: python manage.py createsuperuser
 10. run: python manage.py runserver
 
-# testbench
-# request a ride
-API: api/v1/trip/
-Method:POST
-data: {"user": 1}
-(after we implement authentication we post location to server user_id we may get from auth token)
 
-# pick the ride
-API: api/v1/trip/1/?user_id=1
-Method:PATCH
-data: {"status": "ongoing"}
-user_id in query params 
-(when we implement login we can get user with auth token no need to pass this in query params)
-
-# Customer app
-put customer id if field and click ride now.
-this would post: {"user": 1} on api/v1/trip/ this would create a trip with status waiting
-
-# driver app
-when driver opens up dashboard
-(we identify driver by user_id query params, one we implement authentication
-we can identify driver by his auth token or session token)
-it calls the api: api/v1/trip/?source_app=DRIVER_APP&user_id=1
-
-we get response like below:
-
+# APIs request response
+http://localhost:8000/api/v1/company/?lat=18.9695&lng=72.8193
+[
+    {
+        "id": 4,
+        "name": "test",
+        "address": null,
+        "latitude": 18.9695,
+        "longitude": 72.8193,
+        "position": "SRID=4326;POINT (18.9695 72.8193)",
+        "is_deleted": false,
+        "created": "2018-11-13T17:45:13.367524Z",
+        "updated": "2018-11-13T17:45:13.367571Z",
+        "owner": 1
+    }
+]
+i/v1/slot/?company_id=1
+[
+    {
+        "id": 1,
+        "date": "2018-11-15",
+        "time": "01:00:00",
+        "availability": true,
+        "is_deleted": false,
+        "created": "2018-11-13T17:53:51.454361Z",
+        "updated": "2018-11-13T17:53:51.454404Z",
+        "company": 1
+    },
+    {
+        "id": 2,
+        "date": "2018-11-15",
+        "time": "02:00:00",
+        "availability": true,
+        "is_deleted": false,
+        "created": "2018-11-13T17:53:55.597522Z",
+        "updated": "2018-11-13T17:53:55.597565Z",
+        "company": 1
+    },
+    {
+        "id": 3,
+        "date": "2018-11-15",
+        "time": "03:00:00",
+        "availability": true,
+        "is_deleted": false,
+        "created": "2018-11-13T17:53:59.032354Z",
+        "updated": "2018-11-13T17:53:59.032394Z",
+        "company": 1
+    },
+    {
+        "id": 4,
+        "date": "2018-11-15",
+        "time": "04:00:00",
+        "availability": true,
+        "is_deleted": false,
+        "created": "2018-11-13T17:54:01.840674Z",
+        "updated": "2018-11-13T17:54:01.840713Z",
+        "company": 1
+    },
+    {
+        "id": 5,
+        "date": "2018-11-15",
+        "time": "05:00:00",
+        "availability": true,
+        "is_deleted": false,
+        "created": "2018-11-13T17:54:05.030183Z",
+        "updated": "2018-11-13T17:54:05.030222Z",
+        "company": 1
+    }
+]
