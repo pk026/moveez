@@ -2,21 +2,17 @@
 from __future__ import unicode_literals
 import datetime
 import math
-from django.shortcuts import render
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
-from django.contrib.auth.models import User
 from django.core.mail import send_mail, EmailMessage
-from rest_framework import viewsets, mixins, generics
+from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.permissions import AllowAny
-from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
 
 from .models import Company, Slot
 from .serializers import CompanySerializer, SlotSerializer
 
-# Create your views here.
 
 class CompanyViewset(viewsets.ModelViewSet):
     serializer_class = CompanySerializer
@@ -74,7 +70,7 @@ class SlotViewset(viewsets.ModelViewSet):
         slot_id = request.GET.get('slot_id')
 
         if company_id and slot_id:
-            data = {id: slot_id, 'availability': False};
+            data = {id: slot_id, 'availability': False}
             serializer = self.get_serializer(
                 slot_id, data=data, partial=True)
             if serializer.is_valid():
