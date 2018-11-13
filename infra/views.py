@@ -66,6 +66,7 @@ class SlotViewset(viewsets.ModelViewSet):
         return super(SlotViewset, self).list(request, *args, **kwargs)
     
     def partial_update(self, request, *args, **kwargs):
+        # book slot
         user = request.user
         serializer = self.get_serializer(
             self.get_object(), data=request.data, partial=True)
