@@ -27,8 +27,8 @@ class CompanyViewset(viewsets.ModelViewSet):
         lng = request.GET.get('lng')
         if lat and lng:
             p = Point(
-                lat,
-                lng,
+                float(lat),
+                float(lng),
                 srid=4326
             )
         else:
