@@ -7,7 +7,7 @@ from django.contrib.gis.geos import Point
 from django.core.mail import send_mail, EmailMessage
 from rest_framework import viewsets
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from .models import Company, Slot
@@ -53,7 +53,7 @@ class CompanyViewset(viewsets.ModelViewSet):
 class SlotViewset(viewsets.ModelViewSet):
     serializer_class = SlotSerializer
     queryset = Slot.objects.all()
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
 
     def list(self, request, *args, **kwargs):
         today = datetime.datetime.now().date()
@@ -66,24 +66,30 @@ class SlotViewset(viewsets.ModelViewSet):
         return super(SlotViewset, self).list(request, *args, **kwargs)
     
     def partial_update(self, request, *args, **kwargs):
-        company_id = request.GET.get('company_id')
-        slot_id = request.GET.get('slot_id')
-
-        if company_id and slot_id:
-            data = {id: slot_id, 'availability': False}
-            serializer = self.get_serializer(
-                slot_id, data=data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(
-                    serializer.data,
-                    status=status.HTTP_200_OK
-                )
+        user = request.user
+        serializer = self.get_serializer(
+            self.get_object(), data=request.data, partial=True)
+        if serializer.is_valid():
+            slot = serializer.save()
+            # send email for the booking
+            content = "Hey {username} you have booked a slot on {date} at {time} with {company}".format(
+                username=user,
+                date=slot.date,
+                time=slot.time,
+                company=slot.company.name
+            )
+            send_mail(
+                "Booking confirmation email",
+                content,
+                "pramodku.026@gmail.com",
+                [request.user.email],
+                html_message=content
+            )
             return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST
+                serializer.data,
+                status=status.HTTP_200_OK
             )
         return Response(
-            'not valid request',
+            serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )

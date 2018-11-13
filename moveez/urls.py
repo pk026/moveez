@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from rest_framework import routers
+from rest_framework.authtoken.views import ObtainAuthToken
 
 from infra.views import CompanyViewset, SlotViewset
 
@@ -26,5 +27,6 @@ router.register(r'api/v1/slot', SlotViewset, base_name='slot')
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^api/auth_token', ObtainAuthToken.as_view()),
 ]
 urlpatterns += router.urls
