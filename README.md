@@ -62,7 +62,9 @@ http://localhost:8000/api/v1/company/?lat=18.9695&lng=72.8193
         "owner": 1
     }
 ]
-i/v1/slot/?company_id=1
+
+http://localhost:8000/api/v1/slot/?company_id=1
+
 [
     {
         "id": 1,
